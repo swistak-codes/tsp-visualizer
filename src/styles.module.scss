@@ -1,0 +1,72 @@
+:root {
+  --sc-white: #FAFAFA;
+  --sc-black: #1b1c1e;
+}
+
+.canvasContainer {
+  width: 100%;
+  height: 400px;
+  background-color: var(--sc--white);
+  color: var(--sc--black);
+
+  transition: none;
+  * {
+    transition: none;
+  }
+}
+
+.controlsContainer {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 14px;
+
+  input {
+    margin-left: 8px;
+    width: 50px;
+  }
+}
+
+$point-node-size: 20px;
+
+.pointNode {
+  width: $point-node-size;
+  height: $point-node-size;
+  font-size: $point-node-size/2;
+  border: 1px solid black;
+  border-radius: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  cursor: pointer;
+  transform: translate(-$point-node-size/2, -$point-node-size/2);
+
+  &.selected {
+    border: 2px solid red;
+  }
+
+  &.hull {
+    background: green;
+  }
+
+  :global(.react-flow__handle-left) {
+    top: 50%;
+    left: 50%;
+    transform: none;
+  }
+
+  :global(.react-flow__handle-right) {
+    top: 50%;
+    right: 50%;
+    transform: none;
+  }
+
+  :global(.react-flow__handle) {
+    width: 1px;
+    height: 1px;
+    background: transparent;
+    border: none;
+  }
+}

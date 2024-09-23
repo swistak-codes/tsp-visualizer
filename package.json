@@ -5,10 +5,16 @@
   "scripts": {
     "start": "nx serve",
     "build": "nx build",
-    "test": "nx test"
+    "test": "nx test",
+    "format": "nx format",
+    "nx": "nx"
   },
   "private": true,
   "dependencies": {
+    "@xyflow/react": "^12.3.0",
+    "clsx": "^2.1.1",
+    "lodash": "^4.17.21",
+    "nanoid": "^5.0.7",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "tslib": "^2.3.0"
@@ -33,6 +39,7 @@
     "@swc/helpers": "~0.5.11",
     "@testing-library/react": "15.0.6",
     "@types/jest": "^29.5.12",
+    "@types/lodash": "^4.17.7",
     "@types/node": "18.16.9",
     "@types/react": "18.3.1",
     "@types/react-dom": "18.3.0",
