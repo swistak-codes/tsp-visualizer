@@ -11,15 +11,22 @@ import { executeAnimated, stopAnimation } from '../iterators/execute-animated';
 import { algorithmToIterator } from '../iterators/algorithm-to-iterator';
 import { getFinalTourFromIterator } from '../iterators/get-final-tour-from-iterator';
 import { nodeLimits } from '../../utils/consts';
-import { AlgoGenerator } from '../../utils/types';
+import { AlgoGenerator, AlgoResult } from '../../utils/types';
 
 export const useAnimation = () => {
-  const { isAnimating, setIsAnimating, nodes, setEdges, algorithm } =
-    useAppState();
+  const {
+    isAnimating,
+    setIsAnimating,
+    nodes,
+    setEdges,
+    algorithm,
+    setNodesToColor,
+  } = useAppState();
   const [blockedRewind, setBlockedRewind] = useState(false);
   const [fps, setFps] = useState(30);
   const [isFreshData, setIsFreshData] = useState(true);
   const [iterations, setIterations] = useState(0);
+  const [stage, setStage] = useState<string | undefined>();
   const iterator = useRef<AlgoGenerator>();
 
   const compute = useMemo(() => algorithmToIterator[algorithm], [algorithm]);
@@ -43,6 +50,17 @@ export const useAnimation = () => {
   useEffect(() => {
     reset();
   }, [nodes, reset]);
+
+  const updateResult = useCallback(
+    (result: AlgoResult) => {
+      setEdges(result.edges);
+      const iterations = result.iterationsToAdd ?? 1;
+      setIterations((i) => i + iterations);
+      setNodesToColor(result.nodesToColor || {});
+      setStage(result.stage);
+    },
+    [setEdges, setNodesToColor, setStage]
+  );
 
   const handleFpsChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -68,13 +86,12 @@ export const useAnimation = () => {
       return;
     }
     const result = iterator.current.next();
-    setEdges(result.value);
-    setIterations((i) => i + 1);
+    updateResult(result.value);
 
     if (result.done) {
       setIsFreshData(true);
     }
-  }, [isFreshData, setEdges, startIteration]);
+  }, [isFreshData, startIteration, updateResult]);
 
   const animate = useCallback(async () => {
     if (isFreshData) {
@@ -85,10 +102,11 @@ export const useAnimation = () => {
     }
     setIsAnimating(true);
 
-    await executeAnimated(iterator.current, Math.round(1000 / fps), (edges) => {
-      setIterations((i) => i + 1);
-      setEdges(edges);
-    });
+    await executeAnimated(
+      iterator.current,
+      Math.round(1000 / fps),
+      updateResult
+    );
 
     setIsAnimating((isAnimating) => {
       if (isAnimating) {
@@ -97,7 +115,7 @@ export const useAnimation = () => {
       }
       return isAnimating;
     });
-  }, [fps, isFreshData, setEdges, setIsAnimating, startIteration]);
+  }, [fps, isFreshData, setIsAnimating, startIteration, updateResult]);
 
   const stopPlaying = useCallback(() => {
     stopAnimation();
@@ -117,7 +135,7 @@ export const useAnimation = () => {
       iterator.current,
       currentIt
     );
-    setEdges(result);
+    setEdges(result.edges);
     setIterations(itResult);
     setIsFreshData(true);
   }, [isFreshData, iterations, setEdges, startIteration]);
@@ -134,5 +152,6 @@ export const useAnimation = () => {
     fastForward,
     tooManyNodes,
     iterations,
+    stage,
   };
 };

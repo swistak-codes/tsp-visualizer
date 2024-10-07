@@ -1,4 +1,3 @@
-import { Node } from '@xyflow/react';
 import { distance } from './distance';
 import { AlgoFunction } from '../../utils/types';
 import { pathToEdges } from '../mappers/path-to-edges';
@@ -59,19 +58,24 @@ export const bruteForce: AlgoFunction = function* (nodes, omitIntermediate) {
       );
     }
     if (!omitIntermediate) {
-      yield [
-        ...pathToEdges(currentMinPath, CURRENT_MIN_COLOR),
-        ...pathToEdges(fullPath, CURRENT_TESTED_COLOR),
-      ];
+      yield {
+        edges: [
+          ...pathToEdges(currentMinPath, CURRENT_MIN_COLOR),
+          ...pathToEdges(fullPath, CURRENT_TESTED_COLOR),
+        ],
+      };
     } else {
-      yield [];
+      yield { edges: [] };
     }
     if (currentLength < currentMinLength) {
       currentMinLength = currentLength;
       currentMinPath = fullPath;
     }
   }
-  const finalResult = pathToEdges(currentMinPath, FINAL_COLOR);
+  const finalResult = {
+    edges: pathToEdges(currentMinPath, FINAL_COLOR),
+    iterationsToOmit: 0,
+  };
   yield finalResult;
   return finalResult;
 };

@@ -1,6 +1,7 @@
 import styles from '../styles.module.scss';
 import { usePointControls } from '../logic/hooks/use-point-controls';
 import { useAnimation } from '../logic/hooks/use-animation';
+import { useAppState } from './state-context';
 
 export const Controls = () => {
   const { handleAddPoint, handleRestart, handleDelete, showDeleteButton } =
@@ -17,6 +18,7 @@ export const Controls = () => {
     fastForward,
     tooManyNodes,
     iterations,
+    stage,
   } = useAnimation();
 
   return (
@@ -64,6 +66,7 @@ export const Controls = () => {
           Przewiń do końca
         </button>
       </div>
+      {stage && <div className={styles['controlsContainer']}>{stage}</div>}
       <div className={styles['controlsContainer']}>
         Liczba iteracji: {iterations}
       </div>

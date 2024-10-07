@@ -15,10 +15,3 @@ To start the app run:
 - `npm start`
 
 Open your browser and navigate to http://localhost:4200/.
-
-### Running different algorithms
-
-By the default app plays brute force algorithm. To change it, use query param in the URL. Available algorithms:
-
-- Brute force: http://localhost:4200/?algorithm=brute-force
-- Held-Karp: http://localhost:4200/?algorithm=held-karp

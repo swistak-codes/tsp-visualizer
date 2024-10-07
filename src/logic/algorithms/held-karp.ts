@@ -1,4 +1,4 @@
-import { Edge, Node } from '@xyflow/react';
+import { Node } from '@xyflow/react';
 import { AlgoFunction } from '../../utils/types';
 import { distance } from './distance';
 import { pathToEdges } from '../mappers/path-to-edges';
@@ -30,7 +30,9 @@ function* doHeldKarp(nodes: Node[]) {
   ): Generator<PartialPath> {
     const key = memoKey(visitedSet, last);
     if (memo.has(key)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       yield memo.get(key)!;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return memo.get(key)!;
     }
 
@@ -60,7 +62,6 @@ function* doHeldKarp(nodes: Node[]) {
           minPath = [nodes[last], ...result.path];
         }
 
-        // Generowanie stanu po każdej iteracji
         yield {
           cost: minLength,
           path: minPath,
@@ -112,18 +113,20 @@ export const heldKarp: AlgoFunction = function* (nodes, omitIntermediate) {
   for (const iteration of doHeldKarp(nodes)) {
     lastIteration = iteration;
     if (!omitIntermediate) {
-      yield [
-        ...getOnlyLongestPaths(iteration.memo, 1).flatMap((x) =>
-          pathToEdges(x, CURRENT_MIN_COLOR)
-        ),
-        ...pathToEdges(iteration.path, CURRENT_TESTED_COLOR),
-      ];
+      yield {
+        edges: [
+          ...getOnlyLongestPaths(iteration.memo, 1).flatMap((x) =>
+            pathToEdges(x, CURRENT_MIN_COLOR)
+          ),
+          ...pathToEdges(iteration.path, CURRENT_TESTED_COLOR),
+        ],
+      };
     } else {
-      yield [];
+      yield { edges: [] };
     }
   }
   if (!lastIteration) {
-    return [];
+    return { edges: [] };
   }
-  return pathToEdges(lastIteration.path, FINAL_COLOR);
+  return { edges: pathToEdges(lastIteration.path, FINAL_COLOR) };
 };

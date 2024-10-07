@@ -1,16 +1,14 @@
-import { Edge } from '@xyflow/react';
-
-import { AlgoGenerator } from '../../utils/types';
+import { AlgoGenerator, AlgoResult } from '../../utils/types';
 
 let forceStop = false;
 
 export const executeAnimated = async (
   iterator: AlgoGenerator,
   delay: number,
-  callback: (data: Edge[]) => void
+  callback: (data: AlgoResult) => void
 ) => {
   forceStop = false;
-  let result: IteratorResult<Edge[], Edge[]>;
+  let result: IteratorResult<AlgoResult, AlgoResult>;
   do {
     if (forceStop) {
       break;

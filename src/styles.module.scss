@@ -1,13 +1,9 @@
-:root {
-  --sc-white: #FAFAFA;
-  --sc-black: #1b1c1e;
-}
-
 .canvasContainer {
   width: 100%;
   height: 400px;
   background-color: var(--sc--white);
   color: var(--sc--black);
+  margin-top: 14px;
 
   transition: none;
   * {
@@ -25,6 +21,10 @@
   input {
     margin-left: 8px;
     width: 50px;
+  }
+
+  select {
+    margin-left: 8px;
   }
 }
 

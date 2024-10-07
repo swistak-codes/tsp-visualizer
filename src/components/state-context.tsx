@@ -2,6 +2,8 @@ import { createContext, Dispatch, SetStateAction, useContext } from 'react';
 import { useEdgesState, useNodesState } from '@xyflow/react';
 import { Algorithm } from '../utils/types';
 
+// TODO rewrite to zustand
+// https://reactflow.dev/learn/advanced-use/state-management
 type StateContextType = {
   nodes: ReturnType<typeof useNodesState>[0];
   setNodes: ReturnType<typeof useNodesState>[1];
@@ -12,6 +14,8 @@ type StateContextType = {
   isAnimating: boolean;
   setIsAnimating: Dispatch<SetStateAction<boolean>>;
   algorithm: Algorithm;
+  nodesToColor: Record<string, string>;
+  setNodesToColor: Dispatch<SetStateAction<Record<string, string>>>;
 };
 
 const StateContext = createContext<StateContextType | null>(null);
