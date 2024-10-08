@@ -1,11 +1,13 @@
 import { Handle, NodeProps, Position } from '@xyflow/react';
 import styles from '../styles.module.scss';
 import clsx from 'clsx';
-import { useAppState } from './state-context';
 import { CSSProperties } from 'react';
+import { State, useAppState } from '../utils/store';
+
+const pointNodeSelector = (state: State) => state.nodesToColor;
 
 export const PointNode = ({ id, selected }: NodeProps) => {
-  const { nodesToColor } = useAppState();
+  const nodesToColor = useAppState(pointNodeSelector);
   const additionalCss: CSSProperties =
     id in nodesToColor
       ? {

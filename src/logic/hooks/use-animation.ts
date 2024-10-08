@@ -1,4 +1,3 @@
-import { useAppState } from '../../components/state-context';
 import {
   ChangeEvent,
   useCallback,
@@ -12,16 +11,27 @@ import { algorithmToIterator } from '../iterators/algorithm-to-iterator';
 import { getFinalTourFromIterator } from '../iterators/get-final-tour-from-iterator';
 import { nodeLimits } from '../../utils/consts';
 import { AlgoGenerator, AlgoResult } from '../../utils/types';
+import { State, useAppState } from '../../utils/store';
+
+const useAnimationSelector = (state: State) =>
+  [
+    state.isAnimating,
+    state.setIsAnimating,
+    state.nodes,
+    state.setEdges,
+    state.algorithm,
+    state.setNodesToColor,
+  ] as const;
 
 export const useAnimation = () => {
-  const {
+  const [
     isAnimating,
     setIsAnimating,
     nodes,
     setEdges,
     algorithm,
     setNodesToColor,
-  } = useAppState();
+  ] = useAppState(useAnimationSelector);
   const [blockedRewind, setBlockedRewind] = useState(false);
   const [fps, setFps] = useState(30);
   const [isFreshData, setIsFreshData] = useState(true);

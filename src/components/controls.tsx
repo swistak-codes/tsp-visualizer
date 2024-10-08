@@ -1,7 +1,6 @@
 import styles from '../styles.module.scss';
 import { usePointControls } from '../logic/hooks/use-point-controls';
 import { useAnimation } from '../logic/hooks/use-animation';
-import { useAppState } from './state-context';
 
 export const Controls = () => {
   const { handleAddPoint, handleRestart, handleDelete, showDeleteButton } =

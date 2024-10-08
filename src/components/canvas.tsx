@@ -6,14 +6,23 @@ import {
 } from '@xyflow/react';
 import styles from '../styles.module.scss';
 import '@xyflow/react/dist/style.css';
-import { useAppState } from './state-context';
 
 import { POINT } from '../utils/consts';
 import { PointNode } from './point-node';
+import { State, useAppState } from '../utils/store';
+
+const canvasStoreSelector = (state: State) =>
+  [
+    state.nodes,
+    state.edges,
+    state.onNodesChange,
+    state.onEdgesChange,
+    state.isAnimating,
+  ] as const;
 
 export const Canvas = () => {
-  const { nodes, edges, onNodesChange, onEdgesChange, isAnimating } =
-    useAppState();
+  const [nodes, edges, onNodesChange, onEdgesChange, isAnimating] =
+    useAppState(canvasStoreSelector);
 
   return (
     <div className={styles['canvasContainer']}>
