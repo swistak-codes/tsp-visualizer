@@ -23,13 +23,13 @@ export const usePointControls = () => {
   const handleAddPoint = useCallback(() => {
     const newPoint = createPointNode();
     setNodes([...nodes, newPoint]);
-    window.requestAnimationFrame(() => fitView({ padding: 10 }));
+    window.requestAnimationFrame(() => fitView());
   }, [nodes, setNodes]);
 
   const handleRestart = useCallback(() => {
     stopAnimation();
     setNodes(generateInitialNodes());
-    window.requestAnimationFrame(() => fitView({ padding: 10 }));
+    window.requestAnimationFrame(() => fitView());
   }, [fitView, setNodes]);
 
   const handleDelete = useCallback(() => {
