@@ -2,16 +2,22 @@ import { Dispatch, SetStateAction } from 'react';
 import {
   applyEdgeChanges,
   applyNodeChanges,
-  Node,
   Edge,
-  OnNodesChange,
+  Node,
   OnEdgesChange,
+  OnNodesChange,
 } from '@xyflow/react';
-import { Algorithm } from './types';
+import {
+  Algorithm,
+  SearchStrategy,
+  StartType,
+  TemperatureFunction,
+} from './types';
 import { create, StoreApi } from 'zustand';
-import { generateInitialNodes } from '../logic/generate-initial-nodes';
+import { generateInitialNodes } from '../logic/helpers/generate-initial-nodes';
 import { isFunction } from 'lodash';
 import { createContext } from 'zustand-utils';
+import { defaultTemperatureAlpha } from './consts';
 
 export type State = {
   nodes: Node[];
@@ -20,12 +26,33 @@ export type State = {
   onEdgesChange: OnEdgesChange;
   setNodes: Dispatch<SetStateAction<Node[]>>;
   setEdges: Dispatch<SetStateAction<Edge[]>>;
+
   isAnimating: boolean;
   setIsAnimating: Dispatch<SetStateAction<boolean>>;
+
   algorithm: Algorithm;
   setAlgorithm: (algorithm: Algorithm) => void;
+
   nodesToColor: Record<string, string>;
   setNodesToColor: (nodesToColor: Record<string, string>) => void;
+
+  startType: StartType;
+  setStartType: (startType: StartType) => void;
+
+  maxIterations: number;
+  setMaxIterations: (maxIterations: number) => void;
+
+  temperatureFunction: TemperatureFunction;
+  setTemperatureFunction: (temperatureFunction: TemperatureFunction) => void;
+
+  temperatureAlpha: number;
+  setTemperatureAlpha: (temperatureAlpha: number) => void;
+
+  searchStrategy: SearchStrategy;
+  setSearchStrategy: (searchStrategy: SearchStrategy) => void;
+
+  initialTemperature: number;
+  setInitialTemperature: (initialTemperature: number) => void;
 };
 
 export const createStore = (initialAlgorithm: Algorithm) => () =>
@@ -43,36 +70,60 @@ export const createStore = (initialAlgorithm: Algorithm) => () =>
       });
     },
     setNodes: (nodes) => {
-      setStateToZustand(nodes, 'nodes', set, get);
+      setStateToZustand(nodes, 'nodes', set);
     },
     setEdges: (edges) => {
-      setStateToZustand(edges, 'edges', set, get);
+      setStateToZustand(edges, 'edges', set);
     },
+
     isAnimating: false,
     setIsAnimating: (isAnimating) => {
-      setStateToZustand(isAnimating, 'isAnimating', set, get);
+      setStateToZustand(isAnimating, 'isAnimating', set);
     },
+
     algorithm: initialAlgorithm,
     setAlgorithm: (algorithm) => {
       set({ algorithm });
     },
+
     nodesToColor: {},
     setNodesToColor: (nodesToColor) => {
       set({ nodesToColor });
     },
+
+    startType: StartType.initial,
+    setStartType: (startType) => set({ startType }),
+
+    maxIterations: 1000,
+    setMaxIterations: (maxIterations) => set({ maxIterations }),
+
+    temperatureFunction: TemperatureFunction.linear,
+    setTemperatureFunction: (temperatureFunction) =>
+      set({
+        temperatureFunction,
+        temperatureAlpha: defaultTemperatureAlpha[temperatureFunction],
+      }),
+
+    temperatureAlpha: defaultTemperatureAlpha[TemperatureFunction.linear],
+    setTemperatureAlpha: (temperatureAlpha) => set({ temperatureAlpha }),
+
+    searchStrategy: SearchStrategy.random,
+    setSearchStrategy: (searchStrategy) => set({ searchStrategy }),
+
+    initialTemperature: 100,
+    setInitialTemperature: (initialTemperature) => set({ initialTemperature }),
   }));
 
 const setStateToZustand = <T>(
   setter: SetStateAction<T>,
   propertyName: keyof State,
-  set: StoreApi<State>['setState'],
-  get: StoreApi<State>['getState']
+  set: StoreApi<State>['setState']
 ) => {
-  set({
+  set((state) => ({
     [propertyName]: isFunction(setter)
-      ? setter(get()[propertyName] as T)
+      ? setter(state[propertyName] as T)
       : setter,
-  });
+  }));
 };
 
 const { Provider, useStore } = createContext<StoreApi<State>>();

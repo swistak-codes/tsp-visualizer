@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { createPointNode } from '../mappers/create-point-node';
-import { generateInitialNodes } from '../generate-initial-nodes';
+import { generateInitialNodes } from '../helpers/generate-initial-nodes';
 import { useOnSelectionChange, useReactFlow } from '@xyflow/react';
 import { stopAnimation } from '../iterators/execute-animated';
 import { State, useAppState } from '../../utils/store';
@@ -24,7 +24,7 @@ export const usePointControls = () => {
     const newPoint = createPointNode();
     setNodes([...nodes, newPoint]);
     window.requestAnimationFrame(() => fitView());
-  }, [nodes, setNodes]);
+  }, [fitView, nodes, setNodes]);
 
   const handleRestart = useCallback(() => {
     stopAnimation();

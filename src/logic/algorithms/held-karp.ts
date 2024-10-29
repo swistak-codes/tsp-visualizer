@@ -1,6 +1,6 @@
 import { Node } from '@xyflow/react';
 import { AlgoFunction } from '../../utils/types';
-import { distance } from './distance';
+import { distance } from '../helpers/distance';
 import { pathToEdges } from '../mappers/path-to-edges';
 import {
   CURRENT_MIN_COLOR,
@@ -8,6 +8,7 @@ import {
   FINAL_COLOR,
 } from '../../utils/consts';
 import { orderBy } from 'lodash';
+import { pathDistance } from '../helpers/path-distance';
 
 type PartialPath = {
   cost: number;
@@ -128,5 +129,9 @@ export const heldKarp: AlgoFunction = function* (nodes, omitIntermediate) {
   if (!lastIteration) {
     return { edges: [] };
   }
-  return { edges: pathToEdges(lastIteration.path, FINAL_COLOR) };
+  return {
+    edges: pathToEdges(lastIteration.path, FINAL_COLOR),
+    iterationsToAdd: 0,
+    minLength: pathDistance(lastIteration.path),
+  };
 };

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { distance } from './distance';
+import { distance } from '../helpers/distance';
 import { Node, Edge } from '@xyflow/react';
 import { AlgoFunction, AlgoResult } from '../../utils/types';
 import { pathToEdges } from '../mappers/path-to-edges';
@@ -11,6 +11,7 @@ import {
   FINAL_COLOR,
 } from '../../utils/consts';
 import { nanoid } from 'nanoid';
+import { pathDistance } from '../helpers/path-distance';
 
 type EdgeType = {
   from: Node;
@@ -481,7 +482,7 @@ export const christofides: AlgoFunction = function* (
   yield {
     edges: edgesToRfEdges(multigraph, FINAL_COLOR),
     stage: 'Konstrukcja multigrafu',
-    iterationsToOmit: 0,
+    iterationsToAdd: 0,
   };
 
   // find eulerian circuit
@@ -515,6 +516,7 @@ export const christofides: AlgoFunction = function* (
   const finalResult: AlgoResult = {
     edges: pathToEdges(path, FINAL_COLOR),
     iterationsToAdd: 0,
+    minLength: pathDistance(path),
   };
   yield finalResult;
   return finalResult;

@@ -12,6 +12,10 @@ const algorithmChooserSelector = (state: State) =>
 export function AlgorithmChooser({ algorithms }: Props) {
   const [algorithm, setAlgorithm] = useAppState(algorithmChooserSelector);
 
+  if (algorithms.length === 1) {
+    return null;
+  }
+
   return (
     <div className={styles['controlsContainer']}>
       <label>

@@ -10,7 +10,7 @@ import { executeAnimated, stopAnimation } from '../iterators/execute-animated';
 import { algorithmToIterator } from '../iterators/algorithm-to-iterator';
 import { getFinalTourFromIterator } from '../iterators/get-final-tour-from-iterator';
 import { nodeLimits } from '../../utils/consts';
-import { AlgoGenerator, AlgoResult } from '../../utils/types';
+import { AlgoGenerator, AlgoResult, SaProperties } from '../../utils/types';
 import { State, useAppState } from '../../utils/store';
 
 const useAnimationSelector = (state: State) =>
@@ -21,6 +21,12 @@ const useAnimationSelector = (state: State) =>
     state.setEdges,
     state.algorithm,
     state.setNodesToColor,
+    state.startType,
+    state.maxIterations,
+    state.temperatureFunction,
+    state.temperatureAlpha,
+    state.searchStrategy,
+    state.initialTemperature,
   ] as const;
 
 export const useAnimation = () => {
@@ -31,12 +37,36 @@ export const useAnimation = () => {
     setEdges,
     algorithm,
     setNodesToColor,
+    startType,
+    maxIterations,
+    temperatureFunction,
+    temperatureAlpha,
+    searchStrategy,
+    initialTemperature,
   ] = useAppState(useAnimationSelector);
+  const saProperties: SaProperties = useMemo(
+    () => ({
+      maxIterations,
+      temperatureFunction,
+      temperatureAlpha,
+      searchStrategy,
+      initialTemperature,
+    }),
+    [
+      maxIterations,
+      temperatureFunction,
+      temperatureAlpha,
+      searchStrategy,
+      initialTemperature,
+    ]
+  );
   const [blockedRewind, setBlockedRewind] = useState(false);
   const [fps, setFps] = useState(30);
   const [isFreshData, setIsFreshData] = useState(true);
   const [iterations, setIterations] = useState(0);
-  const [stage, setStage] = useState<string | undefined>();
+  const [stage, setStage] = useState<string | null>(null);
+  const [minLength, setMinLength] = useState<number | null>(null);
+  const [currentLength, setCurrentLength] = useState<number | null>(null);
   const iterator = useRef<AlgoGenerator>();
 
   const compute = useMemo(() => algorithmToIterator[algorithm], [algorithm]);
@@ -54,12 +84,15 @@ export const useAnimation = () => {
     setIsFreshData(true);
     setIterations(0);
     setEdges([]);
+    setStage(null);
+    setMinLength(null);
+    setCurrentLength(null);
     iterator.current = undefined;
   }, [setEdges, setIsAnimating]);
 
   useEffect(() => {
     reset();
-  }, [nodes, reset]);
+  }, [nodes, algorithm, startType, reset, saProperties]);
 
   const updateResult = useCallback(
     (result: AlgoResult) => {
@@ -67,7 +100,9 @@ export const useAnimation = () => {
       const iterations = result.iterationsToAdd ?? 1;
       setIterations((i) => i + iterations);
       setNodesToColor(result.nodesToColor || {});
-      setStage(result.stage);
+      setStage(result.stage || null);
+      setMinLength(result.minLength || null);
+      setCurrentLength(result.currentLength || null);
     },
     [setEdges, setNodesToColor, setStage]
   );
@@ -81,11 +116,16 @@ export const useAnimation = () => {
 
   const startIteration = useCallback(
     (omitIntermediate: boolean) => {
-      iterator.current = compute(structuredClone(nodes), omitIntermediate);
+      iterator.current = compute(
+        structuredClone(nodes),
+        omitIntermediate,
+        startType,
+        saProperties
+      );
       setIsFreshData(false);
       setIterations(0);
     },
-    [compute, nodes]
+    [compute, nodes, saProperties, startType]
   );
 
   const goToNext = useCallback(() => {
@@ -145,10 +185,9 @@ export const useAnimation = () => {
       iterator.current,
       currentIt
     );
-    setEdges(result.edges);
-    setIterations(itResult);
+    updateResult({ ...result, iterationsToAdd: itResult });
     setIsFreshData(true);
-  }, [isFreshData, iterations, setEdges, startIteration]);
+  }, [isFreshData, iterations, startIteration, updateResult]);
 
   return {
     isAnimating,
@@ -163,5 +202,7 @@ export const useAnimation = () => {
     tooManyNodes,
     iterations,
     stage,
+    minLength,
+    currentLength,
   };
 };

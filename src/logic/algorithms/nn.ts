@@ -1,5 +1,5 @@
 import { AlgoFunction } from '../../utils/types';
-import { distance } from './distance';
+import { distance } from '../helpers/distance';
 import { Node } from '@xyflow/react';
 import { pathToEdges } from '../mappers/path-to-edges';
 import {
@@ -7,6 +7,7 @@ import {
   CURRENT_TESTED_COLOR,
   FINAL_COLOR,
 } from '../../utils/consts';
+import { pathDistance } from '../helpers/path-distance';
 
 export const nn: AlgoFunction = function* (nodes, omitIntermediate) {
   const startNode = nodes.find((x) => x.selected) || nodes[0];
@@ -45,7 +46,8 @@ export const nn: AlgoFunction = function* (nodes, omitIntermediate) {
   path.push(startNode);
   const finalResult = {
     edges: pathToEdges(path, FINAL_COLOR),
-    iterationsToOmit: 0,
+    iterationsToAdd: 0,
+    minLength: pathDistance(path),
   };
   yield finalResult;
   return finalResult;

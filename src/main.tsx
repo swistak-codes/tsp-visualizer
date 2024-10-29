@@ -7,6 +7,17 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <StrictMode>
-    <PresentationsTsp algorithms={['brute-force', 'held-karp', 'nn', 'rnn', 'christofides']} />
+    <PresentationsTsp
+      algorithms={[
+        'brute-force',
+        'held-karp',
+        'nn',
+        'rnn',
+        'christofides',
+        'simple-hc',
+        'steepest-ascent-hc',
+        'sa',
+      ]}
+    />
   </StrictMode>
 );

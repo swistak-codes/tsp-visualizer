@@ -1,5 +1,5 @@
 import { AlgoFunction } from '../../utils/types';
-import { distance } from './distance';
+import { distance } from '../helpers/distance';
 import { Node } from '@xyflow/react';
 import { pathToEdges } from '../mappers/path-to-edges';
 import {
@@ -32,6 +32,9 @@ export const rnn: AlgoFunction = function* (nodes, omitIntermediate) {
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               ...pathToEdges([path.at(-1)!, node], CURRENT_TESTED_COLOR),
             ],
+            minLength: isFinite(currentMinLength)
+              ? currentMinLength
+              : undefined,
           };
         } else {
           yield { edges: [] };
@@ -48,12 +51,15 @@ export const rnn: AlgoFunction = function* (nodes, omitIntermediate) {
       length += minDistance;
     }
     path.push(startNode);
+    length += distance(path.at(-2), path.at(-1));
     if (!omitIntermediate) {
       yield {
         edges: [
           ...pathToEdges(currentMinPath, CURRENT_MIN_COLOR),
           ...pathToEdges(path, FINAL_COLOR),
         ],
+        minLength: isFinite(currentMinLength) ? currentMinLength : undefined,
+        currentLength: length,
       };
     } else {
       yield { edges: [] };
@@ -65,7 +71,8 @@ export const rnn: AlgoFunction = function* (nodes, omitIntermediate) {
   }
   const finalResult = {
     edges: pathToEdges(currentMinPath, FINAL_COLOR),
-    iterationsToOmit: 0,
+    iterationsToAdd: 0,
+    minLength: currentMinLength,
   };
   yield finalResult;
   return finalResult;
